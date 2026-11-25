@@ -10,7 +10,7 @@ export async function generateAITurn(params: { personaId: string; difficulty: AI
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 6500);
   try {
-    const url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=)" + apiKey;
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
     const sys = "أنت شخصية عراقية اسمك " + persona.name + ". " + persona.dialectStyle + " " + persona.strategyStyle + " " + getDifficultyInstruction(params.difficulty) + " أجب بناءً على سؤالك فقط ولا تعرف إن كنت المنافق. أعد JSON فقط بـ answer و quip قصيرين باللهجة العراقية.";
     const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: "اللاعبون: " + params.playerNames.join("، ") + " | سؤالك السري: " + params.secretPrompt }] }], generationConfig: { temperature: 0.85, maxOutputTokens: 140, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { answer: { type: "STRING" }, quip: { type: "STRING" } }, required: ["answer", "quip"] } } }) });
     clearTimeout(timer);
@@ -32,7 +32,7 @@ export async function generateAIVote(params: { personaId: string; selfId: string
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const url = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=)" + apiKey;
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey;
     const list = targets.map((t) => t.id + " (" + t.name + "): " + t.answer).join(" | ");
     const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify({ systemInstruction: { parts: [{ text: "أنت " + persona.name + " في لعبة شكّك. السؤال الأصلي: " + params.mainPrompt + ". اختر targetPlayerId الأكثر إثارة للشك من القائمة." }] }, contents: [{ role: "user", parts: [{ text: list }] }], generationConfig: { temperature: 0.5, maxOutputTokens: 60, responseMimeType: "application/json", responseSchema: { type: "OBJECT", properties: { targetPlayerId: { type: "STRING" } }, required: ["targetPlayerId"] } } }) });
     clearTimeout(timer);
