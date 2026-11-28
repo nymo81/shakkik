@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
-import { adminAuth } from "./firebaseAdmin";
+import { getAdminAuth } from "./firebaseAdmin";
+
 export async function getAuthenticatedUid(req: NextRequest): Promise<string | null> {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) return null;
-  try { const decoded = await adminAuth.verifyIdToken(authHeader.slice(7)); return decoded.uid; } catch { return null; }
+  const h = req.headers.get("authorization");
+  if (!h?.startsWith("Bearer ")) return null;
+  try {
+    const d = await getAdminAuth().verifyIdToken(h.slice(7));
+    return d.uid;
+  } catch {
+    return null;
+  }
 }

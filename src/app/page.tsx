@@ -18,7 +18,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { db, ensureAuthUser } from "@/lib/firebaseClient";
+import { db, getClientDb, ensureAuthUser } from "@/lib/firebaseClient";
 import { AI_PERSONAS } from "@/lib/aiPersonas";
 import { AIDifficulty, Player, RoomPublicState } from "@/types/game";
 
@@ -57,7 +57,7 @@ export default function ShakkikApp() {
   // Subscribe to public room document
   useEffect(() => {
     if (!roomCode) return;
-    const unsub = onSnapshot(doc(db, "rooms", roomCode), (snap) => {
+    const clientDb = db || getClientDb(); if (!clientDb) return; const unsub = onSnapshot(doc(clientDb, "rooms", roomCode), (snap) => {
       if (snap.exists()) {
         setRoom(snap.data() as RoomPublicState);
       } else {
@@ -71,7 +71,7 @@ export default function ShakkikApp() {
   // Subscribe to private per-player secret prompt
   useEffect(() => {
     if (!roomCode || !uid) return;
-    const unsub = onSnapshot(doc(db, "rooms", roomCode, "secrets", uid), (snap) => {
+    const clientDb = db || getClientDb(); if (!clientDb) return; const unsub = onSnapshot(doc(clientDb, "rooms", roomCode, "secrets", uid), (snap) => {
       if (snap.exists()) {
         setSecretPrompt(snap.data().prompt || null);
       }
